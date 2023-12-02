@@ -5,9 +5,6 @@ WORKDIR /app
 COPY . .
 ARG TARGETOS TARGETARCH
 
-ENV http_proxy http://127.0.0.1:7890
-ENV https_proxy http://127.0.0.1:7890
-
 RUN apk add --no-cache git make tzdata \
     && GOOS=$TARGETOS GOARCH=$TARGETARCH make clean build
 
