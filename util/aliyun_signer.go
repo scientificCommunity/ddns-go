@@ -59,8 +59,8 @@ func makeDataToSign(w io.Writer, httpMethod string, vals url.Values) {
 }
 
 var (
-	encTilde = "%7E"         // '~' -> "%7E"
-	encBlank = []byte("%20") // ' ' -> "%20"
+	encTilde = "%7E"           // '~' -> "%7E"
+	encBlank = []byte("%2520") // ' ' -> "%20"
 	tilde    = []byte("~")
 )
 

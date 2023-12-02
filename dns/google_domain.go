@@ -31,7 +31,7 @@ type GoogleDomainResp struct {
 }
 
 // Init 初始化
-func (gd *GoogleDomain) Init(dnsConf *config.DnsConfig, ipv4cache *util.IpCache, ipv6cache *util.IpCache) {
+func (gd *GoogleDomain) Init(dnsConf *config.DnsConfig, ipv4cache *util.IpCache, ipv6cache *util.IpCache, spfCache *util.IpCache) {
 	gd.Domains.Ipv4Cache = ipv4cache
 	gd.Domains.Ipv6Cache = ipv6cache
 	gd.DNS = dnsConf.DNS

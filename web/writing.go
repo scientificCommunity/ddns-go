@@ -37,6 +37,12 @@ type dnsConf4JS struct {
 	Ipv4NetInterface string
 	Ipv4Cmd          string
 	Ipv4Domains      string
+	SpfEnable        string
+	SpfGetType       string
+	SpfUrl           string
+	SpfNetInterface  string
+	SpfCmd           string
+	SpfDomains       string
 	Ipv6Enable       string
 	Ipv6GetType      string
 	Ipv6Url          string

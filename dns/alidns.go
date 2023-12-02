@@ -2,12 +2,11 @@ package dns
 
 import (
 	"bytes"
+	"github.com/jeessy2/ddns-go/v5/config"
+	"github.com/jeessy2/ddns-go/v5/util"
 	"log"
 	"net/http"
 	"net/url"
-
-	"github.com/jeessy2/ddns-go/v5/config"
-	"github.com/jeessy2/ddns-go/v5/util"
 )
 
 const (
@@ -44,9 +43,10 @@ type AlidnsResp struct {
 }
 
 // Init 初始化
-func (ali *Alidns) Init(dnsConf *config.DnsConfig, ipv4cache *util.IpCache, ipv6cache *util.IpCache) {
+func (ali *Alidns) Init(dnsConf *config.DnsConfig, ipv4cache *util.IpCache, ipv6cache *util.IpCache, spfCache *util.IpCache) {
 	ali.Domains.Ipv4Cache = ipv4cache
 	ali.Domains.Ipv6Cache = ipv6cache
+	ali.Domains.SpfCache = spfCache
 	ali.DNS = dnsConf.DNS
 	ali.Domains.GetNewIp(dnsConf)
 	if dnsConf.TTL == "" {
@@ -61,6 +61,7 @@ func (ali *Alidns) Init(dnsConf *config.DnsConfig, ipv4cache *util.IpCache, ipv6
 func (ali *Alidns) AddUpdateDomainRecords() config.Domains {
 	ali.addUpdateDomainRecords("A")
 	ali.addUpdateDomainRecords("AAAA")
+	ali.addUpdateDomainRecords("TXT")
 	return ali.Domains
 }
 
@@ -175,6 +176,9 @@ func (ali *Alidns) request(params url.Values, result interface{}) (err error) {
 	}
 
 	client := util.CreateHTTPClient()
+
+	//req.URL.RawQuery = strings.Replace(req.URL.RawQuery, "+", "%20", -1)
+
 	resp, err := client.Do(req)
 	err = util.GetHTTPResponse(resp, alidnsEndpoint, err, result)
 

@@ -108,6 +108,17 @@ func checkAndSave(request *http.Request) string {
 			dnsConf.Ipv6.Domains = strings.Split(v.Ipv6Domains, "\n")
 		}
 
+		dnsConf.Spf.Enable = v.SpfEnable == "on"
+		dnsConf.Spf.GetType = v.SpfGetType
+		dnsConf.Spf.URL = strings.TrimSpace(v.SpfUrl)
+		dnsConf.Spf.NetInterface = v.SpfNetInterface
+		dnsConf.Spf.Cmd = strings.TrimSpace(v.SpfCmd)
+		if strings.Contains(v.SpfDomains, "\r\n") {
+			dnsConf.Spf.Domains = strings.Split(v.SpfDomains, "\r\n")
+		} else {
+			dnsConf.Spf.Domains = strings.Split(v.SpfDomains, "\n")
+		}
+
 		if k < len(conf.DnsConf) {
 			c := &conf.DnsConf[k]
 			idHide, secretHide := getHideIDSecret(c)

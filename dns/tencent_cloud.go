@@ -64,7 +64,7 @@ type TencentCloudStatus struct {
 	}
 }
 
-func (tc *TencentCloud) Init(dnsConf *config.DnsConfig, ipv4cache *util.IpCache, ipv6cache *util.IpCache) {
+func (tc *TencentCloud) Init(dnsConf *config.DnsConfig, ipv4cache *util.IpCache, ipv6cache *util.IpCache, spfCache *util.IpCache) {
 	tc.Domains.Ipv4Cache = ipv4cache
 	tc.Domains.Ipv6Cache = ipv6cache
 	tc.DNS = dnsConf.DNS

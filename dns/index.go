@@ -10,7 +10,7 @@ import (
 
 // DNS interface
 type DNS interface {
-	Init(dnsConf *config.DnsConfig, ipv4cache *util.IpCache, ipv6cache *util.IpCache)
+	Init(dnsConf *config.DnsConfig, ipv4cache *util.IpCache, ipv6cache *util.IpCache, spfCache *util.IpCache)
 	// 添加或更新IPv4/IPv6记录
 	AddUpdateDomainRecords() (domains config.Domains)
 }
@@ -29,7 +29,7 @@ var (
 		tencentCloudEndPoint,
 	}
 
-	Ipcache = [][2]util.IpCache{}
+	Ipcache = [][3]util.IpCache{}
 )
 
 // RunTimer 定时运行
@@ -49,9 +49,9 @@ func RunOnce() {
 		return
 	}
 	if util.ForceCompareGlobal || len(Ipcache) != len(conf.DnsConf) {
-		Ipcache = [][2]util.IpCache{}
+		Ipcache = [][3]util.IpCache{}
 		for range conf.DnsConf {
-			Ipcache = append(Ipcache, [2]util.IpCache{{}, {}})
+			Ipcache = append(Ipcache, [3]util.IpCache{{}, {}})
 		}
 	}
 
@@ -85,7 +85,7 @@ func RunOnce() {
 		default:
 			dnsSelected = &Alidns{}
 		}
-		dnsSelected.Init(&dc, &Ipcache[i][0], &Ipcache[i][1])
+		dnsSelected.Init(&dc, &Ipcache[i][0], &Ipcache[i][1], &Ipcache[i][2])
 		domains := dnsSelected.AddUpdateDomainRecords()
 		// webhook
 		v4Status, v6Status := config.ExecWebhook(&domains, &conf)

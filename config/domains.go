@@ -19,6 +19,9 @@ type Domains struct {
 	Ipv6Addr    string
 	Ipv6Cache   *util.IpCache
 	Ipv6Domains []*Domain
+	SpfAddr     string
+	SpfDomains  []*Domain
+	SpfCache    *util.IpCache
 }
 
 // Domain 域名实体
@@ -68,6 +71,7 @@ func (d Domain) GetCustomParams() url.Values {
 func (domains *Domains) GetNewIp(dnsConf *DnsConfig) {
 	domains.Ipv4Domains = checkParseDomains(dnsConf.Ipv4.Domains)
 	domains.Ipv6Domains = checkParseDomains(dnsConf.Ipv6.Domains)
+	domains.SpfDomains = checkParseDomains(dnsConf.Spf.Domains)
 
 	// IPv4
 	if dnsConf.Ipv4.Enable && len(domains.Ipv4Domains) > 0 {
@@ -98,6 +102,22 @@ func (domains *Domains) GetNewIp(dnsConf *DnsConfig) {
 				domains.Ipv6Domains[0].UpdateStatus = UpdatedFailed
 			}
 			log.Println("未能获取IPv6地址, 将不会更新")
+		}
+	}
+
+	// Spf
+	if dnsConf.Spf.Enable && len(domains.SpfDomains) > 0 {
+		spfAddr := dnsConf.GetSpfTXT()
+		if spfAddr != "" {
+			domains.SpfAddr = spfAddr
+			domains.SpfCache.TimesFailedIP = 0
+		} else {
+			// 启用IPv4 & 未获取到IP & 填写了域名 & 失败刚好3次，防止偶尔的网络连接失败，并且只发一次
+			domains.SpfCache.TimesFailedIP++
+			if domains.SpfCache.TimesFailedIP == 3 {
+				domains.SpfDomains[0].UpdateStatus = UpdatedFailed
+			}
+			log.Println("未能获取IPv4地址, 将不会更新")
 		}
 	}
 
@@ -173,19 +193,31 @@ func checkParseDomains(domainArr []string) (domains []*Domain) {
 
 // GetNewIpResult 获得GetNewIp结果
 func (domains *Domains) GetNewIpResult(recordType string) (ipAddr string, retDomains []*Domain) {
-	if recordType == "AAAA" {
+	switch recordType {
+	case "AAAA":
 		if domains.Ipv6Cache.Check(domains.Ipv6Addr) {
 			return domains.Ipv6Addr, domains.Ipv6Domains
 		} else {
 			log.Printf("IPv6未改变，将等待 %d 次后与DNS服务商进行比对\n", domains.Ipv6Cache.Times)
 			return "", domains.Ipv6Domains
 		}
-	}
-	// IPv4
-	if domains.Ipv4Cache.Check(domains.Ipv4Addr) {
-		return domains.Ipv4Addr, domains.Ipv4Domains
-	} else {
-		log.Printf("IPv4未改变，将等待 %d 次后与DNS服务商进行比对\n", domains.Ipv4Cache.Times)
+	case "A":
+		// IPv4
+		if domains.Ipv4Cache.Check(domains.Ipv4Addr) {
+			return domains.Ipv4Addr, domains.Ipv4Domains
+		} else {
+			log.Printf("IPv4未改变，将等待 %d 次后与DNS服务商进行比对\n", domains.Ipv4Cache.Times)
+			return "", domains.Ipv4Domains
+		}
+	case "TXT":
+		// SPF
+		if domains.SpfCache.Check(domains.SpfAddr) {
+			return domains.SpfAddr, domains.SpfDomains
+		} else {
+			log.Printf("IPv4未改变，将等待 %d 次后与DNS服务商进行比对\n", domains.Ipv4Cache.Times)
+			return "", domains.SpfDomains
+		}
+	default:
 		return "", domains.Ipv4Domains
 	}
 }

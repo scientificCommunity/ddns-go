@@ -47,7 +47,7 @@ type PorkbunDomainCreateOrUpdateVO struct {
 }
 
 // Init 初始化
-func (pb *Porkbun) Init(conf *config.DnsConfig, ipv4cache *util.IpCache, ipv6cache *util.IpCache) {
+func (pb *Porkbun) Init(conf *config.DnsConfig, ipv4cache *util.IpCache, ipv6cache *util.IpCache, spfCache *util.IpCache) {
 	pb.Domains.Ipv4Cache = ipv4cache
 	pb.Domains.Ipv6Cache = ipv6cache
 	pb.DNSConfig = conf.DNS

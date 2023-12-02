@@ -42,6 +42,17 @@ type DnsConfig struct {
 		IPv6Reg      string // ipv6匹配正则表达式
 		Domains      []string
 	}
+
+	Spf struct {
+		Enable bool
+		// 获取IP类型 url/netInterface
+		GetType      string
+		URL          string
+		NetInterface string
+		Cmd          string
+		Domains      []string
+	}
+
 	DNS DNS
 	TTL string
 }
@@ -268,6 +279,22 @@ func (conf *DnsConfig) GetIpv4Addr() string {
 	case "cmd":
 		// 从命令行获取 IP
 		return conf.getAddrFromCmd("IPv4")
+	default:
+		log.Println("IPv4 的 获取 IP 方式 未知！")
+		return "" // unknown type
+	}
+}
+
+// GetIpv4Addr 获得IPv4地址
+func (conf *DnsConfig) GetSpfTXT() string {
+	// 判断从哪里获取IP
+	switch conf.Spf.GetType {
+	case "url":
+		// 从 URL 获取 IP
+		return "v=spf1 mx ip4:" + conf.getIpv4AddrFromUrl() + " ~all"
+	case "cmd":
+		// 从命令行获取 IP
+		return "v=spf1 mx ip4:" + conf.getAddrFromCmd("IPv4") + " ~all"
 	default:
 		log.Println("IPv4 的 获取 IP 方式 未知！")
 		return "" // unknown type
