@@ -2,6 +2,8 @@
 FROM --platform=$BUILDPLATFORM golang:1.20-alpine AS builder
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+RUN go env -w GO111MODULE=on
+RUN go env -w GOPROXY=https://goproxy.cn,direct
 
 WORKDIR /app
 COPY . .
