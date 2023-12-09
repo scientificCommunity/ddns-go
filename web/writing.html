@@ -272,10 +272,10 @@
                     </div>
 
                     <div class="form-group row">
-                        <label for="ipv6_domains" class="col-sm-2 col-form-label">Domains</label>
+                        <label for="spf_domains" class="col-sm-2 col-form-label">Domains</label>
                         <div class="col-sm-10">
                   <textarea class="form-control form" id="spf_domains" name="SpfDomains" rows="3"
-                            aria-describedby="ipv6_domains_help"></textarea>
+                            aria-describedby="spf_domains_help"></textarea>
                             <small id="spf_domains_help" class="form-text text-muted">
                                 一行一个域名, 可使用冒号手动分隔主机记录, 如：ddns:example.com.cn <a target="blank"
                                                                                                     href="https://github.com/jeessy2/ddns-go/wiki/传递自定义参数">支持传递自定义参数</a>
@@ -506,6 +506,12 @@
       'Ipv6Cmd': '',
       'IPv6Reg': '',
       'Ipv6Domains': '',
+        'SpfEnable': 'on',
+        'SpfGetType': 'url',
+        'SpfUrl': 'https://myip4.ipip.net,https://ddns.oray.com/checkip,https://ip.3322.net,https://4.ipw.cn',
+        'SpfCmd': '',
+        'SpfReg': '',
+        'SpfDomains': '',
     };
 
     window.addEventListener('load', () => {
@@ -522,10 +528,14 @@
         'Ipv6Cmd': document.getElementById('ipv6_cmd'),
         'IPv6Reg': document.getElementById('IPv6Reg'),
         'Ipv6Domains': document.getElementById('ipv6_domains'),
+          'SpfUrl': document.getElementById('spf_url'),
+          'SpfCmd': document.getElementById('spf_cmd'),
+          'SpfDomains': document.getElementById('spf_domains'),
       };
       elemCheck = {
         'Ipv4Enable': document.getElementById('ipv4_enable'),
         'Ipv6Enable': document.getElementById('ipv6_enable'),
+        'SpfEnable': document.getElementById('spf_enable'),
       };
       elemRadio = {
         'DnsName': {

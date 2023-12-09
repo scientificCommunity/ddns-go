@@ -100,6 +100,12 @@ func getDnsConfStr(dnsConf []config.DnsConfig) string {
 			Ipv6Cmd:          conf.Ipv6.Cmd,
 			IPv6Reg:          conf.Ipv6.IPv6Reg,
 			Ipv6Domains:      strings.Join(conf.Ipv6.Domains, "\r\n"),
+			SpfEnable:        BooltoOn(conf.Spf.Enable),
+			SpfGetType:       conf.Spf.GetType,
+			SpfUrl:           conf.Spf.URL,
+			SpfNetInterface:  conf.Spf.NetInterface,
+			SpfCmd:           conf.Spf.Cmd,
+			SpfDomains:       strings.Join(conf.Spf.Domains, "\r\n"),
 		})
 	}
 	byt, _ := json.Marshal(dnsConfArray)
