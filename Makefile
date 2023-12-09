@@ -18,7 +18,7 @@ build: $(DIR_SRC)/main.go
 	@$(GO) build $(GO_FLAGS) -o $(BIN) $(DIR_SRC)
 
 build_docker_image:
-	@$(DOCKER) build -f ./Dockerfile -t ddns-go-spf:0.0.1 .
+	@$(DOCKER) build -f ./Dockerfile -t ddns-go-spf:0.0.2 .
 
 test:
 	@$(GO) test ./...
