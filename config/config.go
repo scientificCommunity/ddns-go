@@ -224,6 +224,34 @@ func (conf *DnsConfig) getIpv4AddrFromUrl() string {
 	return ""
 }
 
+func (conf *DnsConfig) getIpv4AddressesFromUrl() []string {
+	client := util.CreateNoProxyHTTPClient("tcp4")
+	urls := strings.Split(conf.Ipv4.URL, ",")
+	var results []string
+	for _, url := range urls {
+		url = strings.TrimSpace(url)
+		resp, err := client.Get(url)
+		if err != nil {
+			log.Printf("连接失败! <a target='blank' href='%s'>点击查看接口能否返回IPv4地址</a>\n", url)
+			log.Printf("错误信息: %s\n", err)
+			continue
+		}
+		defer resp.Body.Close()
+		lr := io.LimitReader(resp.Body, 1024000)
+		body, err := io.ReadAll(lr)
+		if err != nil {
+			log.Println("读取IPv4结果失败! 接口: ", url)
+			continue
+		}
+		result := Ipv4Reg.FindString(string(body))
+		if result == "" {
+			log.Printf("获取IPv4结果失败! 接口: %s ,返回值: %s\n", url, result)
+		}
+		results = append(results, result)
+	}
+	return results
+}
+
 func (conf *DnsConfig) getAddrFromCmd(addrType string) string {
 	var cmd string
 	var comp *regexp.Regexp
@@ -285,13 +313,18 @@ func (conf *DnsConfig) GetIpv4Addr() string {
 	}
 }
 
-// GetIpv4Addr 获得IPv4地址
+// GetSpfTXT GetIpv4Addr 获得IPv4地址
 func (conf *DnsConfig) GetSpfTXT() string {
 	// 判断从哪里获取IP
 	switch conf.Spf.GetType {
 	case "url":
 		// 从 URL 获取 IP
-		return "v=spf1 mx ip4:" + conf.getIpv4AddrFromUrl() + " ~all"
+		//return "v=spf1 mx ip4:" + conf.getIpv4AddrFromUrl() + " ~all"
+		var result = "v=spf1 mx"
+		for _, ipv4Addr := range conf.getIpv4AddressesFromUrl() {
+			result += " ip4:" + ipv4Addr
+		}
+		return result + " ~all"
 	case "cmd":
 		// 从命令行获取 IP
 		return "v=spf1 mx ip4:" + conf.getAddrFromCmd("IPv4") + " ~all"
